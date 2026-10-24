@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Maosh va Xarajatlar - Aqlli Hisoblagich</title>
+  
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  
+  <!-- Modern Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Styling -->
+  <link rel="stylesheet" href="css/modern.css">
+</head>
+<body>
+  <div id="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="user-profile">
+        <div class="user-avatar" id="user-avatar">M</div>
+        <div class="user-info">
+          <div class="app-title" id="user-name">Foydalanuvchi</div>
+          <div class="today-date" id="current-date">Bugun</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="btn-open-export" title="Hisobotni yuklash">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Tabs -->
+    <main class="main-content">
+      
+      <!-- TAB 1: SMART KALKULYATOR (ASOSIY) -->
+      <section id="tab-calculator" class="tab-screen active">
+        <!-- Live Cash Balance Card -->
+        <div class="live-cash-card">
+          <div class="cash-headline">
+            <span>Bugungi Erkin Qoldiq</span>
+            <span class="badge cyan">Jonli Kassa</span>
+          </div>
+          <div class="live-free-balance">
+            <span id="live-free-sum">0</span>
+            <span class="currency-sub">so'm</span>
+          </div>
+          <div class="cash-strip">
+            <div class="strip-item">
+              <span class="strip-label">Tushum (+)</span>
+              <span class="strip-value income" id="strip-income">+0</span>
+            </div>
+            <div class="strip-item">
+              <span class="strip-label">Xarajat (-)</span>
+              <span class="strip-value expense" id="strip-expense">-0</span>
+            </div>
+            <div class="strip-item">
+              <span class="strip-label">Kredit zaxirasi</span>
+              <span class="strip-value reserve" id="strip-reserve">-0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calculator Display -->
+        <div class="calc-display-card">
+          <div class="calc-expression" id="calc-expr">&nbsp;</div>
+          <div class="calc-current-value">
+            <span id="calc-val">0</span>
+            <span class="currency-sub">so'm</span>
+          </div>
+        </div>
+
+        <!-- Type Selector (Xarajat vs Daromad) -->
+        <div class="type-toggle-bar">
+          <button class="toggle-btn active expense" id="toggle-expense">
+            <span>🔴 Xarajat</span>
+          </button>
+          <button class="toggle-btn income" id="toggle-income">
+            <span>🟢 Daromad</span>
+          </button>
+        </div>
+
+        <!-- Category Quick Chips (only visible for expense) -->
+        <div class="category-tags-scroll" id="expense-categories">
+          <button class="cat-chip selected" data-cat="food">🍔 Tushlik</button>
+          <button class="cat-chip" data-cat="transport">🚕 Yo'l / Benzin</button>
+          <button class="cat-chip" data-cat="small">☕️ Mayda-chuyda</button>
+          <button class="cat-chip" data-cat="home">🏠 Uy / Ro'zg'or</button>
+          <button class="cat-chip" data-cat="habits">⚡️ Odatlar</button>
+          <button class="cat-chip" data-cat="other">💡 Boshqa</button>
+        </div>
+
+        <!-- NumPad Grid -->
+        <div class="numpad-grid">
+          <button class="num-btn" data-key="7">7</button>
+          <button class="num-btn" data-key="8">8</button>
+          <button class="num-btn" data-key="9">9</button>
+          <button class="num-btn operator" data-key="clear">C</button>
+
+          <button class="num-btn" data-key="4">4</button>
+          <button class="num-btn" data-key="5">5</button>
+          <button class="num-btn" data-key="6">6</button>
+          <button class="num-btn operator" data-key="+">+</button>
+
+          <button class="num-btn" data-key="1">1</button>
+          <button class="num-btn" data-key="2">2</button>
+          <button class="num-btn" data-key="3">3</button>
+          <button class="num-btn operator" data-key="backspace">⌫</button>
+
+          <button class="num-btn" data-key="00">00</button>
+          <button class="num-btn" data-key="0">0</button>
+          <button class="num-btn action-btn submit-expense" id="btn-submit-action">
+            <span>Kiritish ✓</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- TAB 2: KREDITLAR VA QARZLAR -->
+      <section id="tab-loans" class="tab-screen">
+        <!-- Daily Loan Reserve Banner -->
+        <div class="section-card" style="border-left: 4px solid var(--accent-reserve);">
+          <div class="card-header-row">
+            <span class="card-title">🛡 Kunlik Kredit Zaxirasi</span>
+            <span class="badge amber" id="daily-reserve-badge">0 so'm/kun</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.4;">
+            Oy oxirida kredit to'lovidan qiynalmasligingiz uchun har kungi daromadingizdan ushbu summa zaxiraga ajratiladi.
+          </p>
+        </div>
+
+        <!-- Loans List Header -->
+        <div class="card-header-row" style="margin-top: 6px;">
+          <span class="card-title">Faol Kreditlar va Qarzlar</span>
+          <button class="pay-btn-sm" id="btn-open-add-loan">+ Yangi Qarz</button>
+        </div>
+
+        <div id="loans-list-container">
+          <!-- Dynamically populated loans -->
+        </div>
+      </section>
+
+      <!-- TAB 3: AQLLI TAHLIL & QORA TUYNUQ -->
+      <section id="tab-analytics" class="tab-screen">
+        <!-- Mystery Loss (Qora Tuynuk) Card -->
+        <div class="section-card" style="border-left: 4px solid #F97316;">
+          <div class="card-header-row">
+            <span class="card-title">🕳 "Qora Tuynuk" Detektori</span>
+            <span class="badge red">Tekshiruv</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">
+            Cho'ntagingizdagi naqd pulni hisob bilan solishtiring. Yo'qolgan noma'lum pullar fosh etiladi!
+          </p>
+          <div style="display: flex; gap: 8px;">
+            <input type="number" id="pocket-cash-input" class="form-input" placeholder="Cho'ntakdagi naqd pul..." style="flex: 1;">
+            <button class="pay-btn-sm" id="btn-check-mystery" style="background: #F97316; color: #fff; border: none; padding: 0 16px;">Solishtir</button>
+          </div>
+          <div id="mystery-loss-result" style="margin-top: 10px; font-size: 13px; display: none;"></div>
+        </div>
+
+        <!-- Monthly Overview Card -->
+        <div class="section-card">
+          <div class="card-header-row">
+            <span class="card-title" id="analytics-month-title">Oylik Tahlil</span>
+            <span class="badge cyan">Statistika</span>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+            <div style="background: var(--bg-secondary); padding: 12px; border-radius: 12px;">
+              <div style="font-size: 11px; color: var(--text-muted);">Jami Daromad</div>
+              <div style="font-size: 16px; font-weight: 800; color: var(--accent-income);" id="stat-income">+0</div>
+            </div>
+            <div style="background: var(--bg-secondary); padding: 12px; border-radius: 12px;">
+              <div style="font-size: 11px; color: var(--text-muted);">Jami Xarajat</div>
+              <div style="font-size: 16px; font-weight: 800; color: var(--accent-expense);" id="stat-expense">-0</div>
+            </div>
+          </div>
+
+          <!-- Latte Effect Box -->
+          <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 12px; padding: 12px; margin-bottom: 12px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--accent-reserve); margin-bottom: 4px;">
+              ☕️ Mayda Xarajatlar Fojiasi (Latte effekti)
+            </div>
+            <div style="font-size: 13px; color: var(--text-secondary);" id="stat-small-text">
+              Bu oyda 0 so'm mayda-chuyda xarajat qilindi.
+            </div>
+          </div>
+
+          <!-- Labor Hours Box -->
+          <div style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 12px; padding: 12px; margin-bottom: 14px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--accent-purple); margin-bottom: 4px;">
+              ⏳ Mehnat Soatiga Aylantirilganda
+            </div>
+            <div style="font-size: 13px; color: var(--text-secondary);" id="stat-hours-text">
+              Xarajatlaringiz taxminan 0 soatlik mehnatingizga teng.
+            </div>
+          </div>
+
+          <!-- Category Breakdown Progress Bars -->
+          <div class="card-title" style="font-size: 13px; margin-bottom: 10px;">Xarajatlar Yo'nalishlari:</div>
+          <div id="category-bars-container">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: TARIX VA KOPILKA -->
+      <section id="tab-history" class="tab-screen">
+        <!-- Sub Switcher -->
+        <div class="type-toggle-bar" style="margin-bottom: 14px;">
+          <button class="toggle-btn active expense" id="subtab-tx-btn">📜 Tranzaksiyalar</button>
+          <button class="toggle-btn" id="subtab-goals-btn">🎯 Kopilka (Jamg'arma)</button>
+        </div>
+
+        <!-- Transactions View -->
+        <div id="view-transactions-list">
+          <div id="tx-items-container">
+            <!-- List of items -->
+          </div>
+        </div>
+
+        <!-- Goals View -->
+        <div id="view-goals-list" style="display: none;">
+          <div class="card-header-row">
+            <span class="card-title">Orzular Jamg'armasi</span>
+            <button class="pay-btn-sm" id="btn-open-add-goal">+ Yangi Maqsad</button>
+          </div>
+          <div id="goals-items-container">
+            <!-- Goals list -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <div class="nav-tab active" data-tab="tab-calculator">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+          <line x1="8" y1="6" x2="16" y2="6"></line>
+          <line x1="16" y1="14" x2="16" y2="18"></line>
+          <path d="M16 10h.01"></path>
+          <path d="M12 10h.01"></path>
+          <path d="M8 10h.01"></path>
+          <path d="M12 14h.01"></path>
+          <path d="M8 14h.01"></path>
+          <path d="M12 18h.01"></path>
+          <path d="M8 18h.01"></path>
+        </svg>
+        <span>Kalkulyator</span>
+      </div>
+
+      <div class="nav-tab" data-tab="tab-loans">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+          <line x1="1" y1="10" x2="23" y2="10"></line>
+        </svg>
+        <span>Qarzlar</span>
+      </div>
+
+      <div class="nav-tab" data-tab="tab-analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        <span>Tahlil</span>
+      </div>
+
+      <div class="nav-tab" data-tab="tab-history">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span>Tarix</span>
+      </div>
+    </nav>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-msg" id="toast-msg">Xabar</div>
+
+    <!-- MODAL 1: EXPORT (PDF & EXCEL) -->
+    <div class="modal-overlay" id="modal-export">
+      <div class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">
+          <span>Hisobotni Yuklab Olish</span>
+          <button class="icon-btn" id="close-export-modal" style="width:28px; height:28px;">✕</button>
+        </div>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+          Oy bo'yicha to'liq hisobotingizni qulay formatda oling:
+        </p>
+        <button class="primary-btn" id="btn-dl-pdf" style="margin-bottom: 10px; background: linear-gradient(135deg, #EF4444, #B91C1C);">
+          📑 PDF Hisobot (Chiroyli Dizayn)
+        </button>
+        <button class="primary-btn" id="btn-dl-excel" style="background: linear-gradient(135deg, #10B981, #047857);">
+          📊 Excel Jadval (Toza Format)
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL 2: ADD LOAN -->
+    <div class="modal-overlay" id="modal-add-loan">
+      <div class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">
+          <span>Yangi Qarz yoki Kredit</span>
+          <button class="icon-btn" id="close-add-loan" style="width:28px; height:28px;">✕</button>
+        </div>
+        <form id="form-add-loan">
+          <div class="form-group">
+            <label class="form-label">Kredit Nomi</label>
+            <input type="text" id="loan-title" class="form-input" placeholder="Masalan: Uzum Nasiya (Telefon)" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jami Qarz Summasi (so'm)</label>
+            <input type="number" id="loan-total" class="form-input" placeholder="Masalan: 3600000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Oylik To'lov Summasi (so'm)</label>
+            <input type="number" id="loan-monthly" class="form-input" placeholder="Masalan: 600000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">To'lov Sanasi (Har oyning qaysi kuni: 1-31)</label>
+            <input type="number" id="loan-day" class="form-input" placeholder="20" min="1" max="31" value="20" required>
+          </div>
+          <button type="submit" class="primary-btn">Saqlash</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 3: PAY LOAN -->
+    <div class="modal-overlay" id="modal-pay-loan">
+      <div class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">
+          <span id="pay-loan-title">Kredit To'lovi</span>
+          <button class="icon-btn" id="close-pay-loan" style="width:28px; height:28px;">✕</button>
+        </div>
+        <form id="form-pay-loan">
+          <input type="hidden" id="pay-loan-id">
+          <div class="form-group">
+            <label class="form-label">To'lov Summasi (so'm)</label>
+            <input type="number" id="pay-loan-amount" class="form-input" placeholder="To'lanayotgan summa..." required>
+          </div>
+          <button type="submit" class="primary-btn" style="background: linear-gradient(135deg, #10B981, #059669);">
+            To'lovni Tasdiqlash ✓
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 4: ADD GOAL (KOPILKA) -->
+    <div class="modal-overlay" id="modal-add-goal">
+      <div class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">
+          <span>Yangi Jamg'arma Maqsadi</span>
+          <button class="icon-btn" id="close-add-goal" style="width:28px; height:28px;">✕</button>
+        </div>
+        <form id="form-add-goal">
+          <div class="form-group">
+            <label class="form-label">Maqsad Nomi</label>
+            <input type="text" id="goal-title" class="form-input" placeholder="Masalan: Yangi telefon yoki Sayoxat" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Yig'ilishi Kerak Bo'lgan Summa (so'm)</label>
+            <input type="number" id="goal-target" class="form-input" placeholder="Masalan: 4000000" required>
+          </div>
+          <button type="submit" class="primary-btn">Maqsadni Yaratish</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 5: DEPOSIT GOAL -->
+    <div class="modal-overlay" id="modal-deposit-goal">
+      <div class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">
+          <span id="deposit-goal-title">Jamg'armaga Pul Qo'shish</span>
+          <button class="icon-btn" id="close-deposit-goal" style="width:28px; height:28px;">✕</button>
+        </div>
+        <form id="form-deposit-goal">
+          <input type="hidden" id="deposit-goal-id">
+          <div class="form-group">
+            <label class="form-label">Qo'shilayotgan Summa (so'm)</label>
+            <input type="number" id="deposit-goal-amount" class="form-input" placeholder="Summa..." required>
+          </div>
+          <button type="submit" class="primary-btn" style="background: linear-gradient(135deg, #8B5CF6, #6D28D9);">
+            Kopilkaga Tashlash ✓
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/telegram.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+# Environment variables and secrets
+.env
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+dist/
+
+# Binaries and archives
+*.exe
+*.zip
+*.tar.gz
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
